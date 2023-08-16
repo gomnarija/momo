@@ -162,6 +162,15 @@ private:
 
 
 
+
+static moNumber moTrue(1);
+static std::shared_ptr<moVal> TRUE = 
+    std::make_shared<moNumber>(moTrue);
+
+static moNumber moFalse(0);
+static std::shared_ptr<moVal> FALSE = 
+    std::make_shared<moNumber>(moFalse);
+
 //error handling
 extern std::string				LOG_FILENAME;
 extern uint32_t					LOG_LINE;
@@ -169,8 +178,8 @@ extern std::stringstream		LOG_STREAM;
 void							write_error(const std::string &);
 void							write_warning(const std::string &);
 void							write_debug(const std::string &);
-
-
+void							write_raw(const std::string &);
+void							write_raw_line(const std::string &);
 
 
 
@@ -183,14 +192,32 @@ moValPtr 			eval(moValPtr, moEnv&);
 //core
 moValPtr 	mo_sum(moListPtr, moEnv&);
 moValPtr 	mo_difference(moListPtr, moEnv&);
+moValPtr 	mo_product(moListPtr, moEnv&);
+moValPtr	mo_quotient(moListPtr, moEnv&);
+moValPtr	mo_truth_value(moListPtr, moEnv&);
+moValPtr	mo_not_truth_value(moListPtr, moEnv&);
+moValPtr	mo_equals(moListPtr, moEnv&);
+moValPtr	mo_greater(moListPtr, moEnv&);
+moValPtr	mo_less(moListPtr, moEnv&);
+moValPtr	mo_greater_or_equals(moListPtr, moEnv&);
+moValPtr	mo_less_or_equals(moListPtr, moEnv&);
+moValPtr	mo_and(moListPtr, moEnv&);
+moValPtr	mo_or(moListPtr, moEnv&);
+
+moValPtr	mo_if(moListPtr, moEnv&);
 
 
+moValPtr	mo_print(moListPtr, moEnv&);
 
-//utils
+//utils, TODO: move to another header
 double			string_to_number(const std::string &);
 double			string_to_number(moValPtr);
 std::string		string_remove_quotes(const std::string &);
 std::string 	get_file_name(const std::string &path);
+size_t          ustrlen(const std::string &);
+size_t			ustrlen(const char *s);
+
+
 
 }
 

@@ -25,12 +25,12 @@ int main(){
 
     momo::moEnv env;
     // std::string str = "[ - 26 5 ]";
-    // momo::moValPtr res = momo::readString(str);
+    // momo::moValPtr res = momo::read_string(str);
     // momo::moValPtr eres = momo::eval(res, env);
     // std::cout << eres->print();
     // std::cout << momo::LOG_STREAM.str();
 
-    momo::moListPtr res = momo::readFile("staznam.momo");
+    momo::moListPtr res = momo::read_file("staznam.momo");
 
     for(int i=0;i<res->size();i++){
         momo::moValPtr eres = momo::eval(res->at(i), env);

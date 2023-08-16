@@ -14,15 +14,23 @@ std::stringstream			LOG_STREAM;
         add lines, time...
 */
 void write_error(const std::string &msg){
-    LOG_STREAM << "[GREŠKA] " <<  LOG_FILENAME <<  ":" << LOG_LINE << " "  << msg << "\n";
+    LOG_STREAM << "[GREŠKA] " <<  LOG_FILENAME <<  ":" << LOG_LINE << "> "  << msg << "\n";
 }
 
 void write_warning(const std::string &msg){
-    LOG_STREAM << "[POZOR] " <<  LOG_FILENAME <<  ":" << LOG_LINE << " "  << msg << "\n";
+    LOG_STREAM << "[POZOR] " <<  LOG_FILENAME <<  ":" << LOG_LINE << "> "  << msg << "\n";
 }
 
 void write_debug(const std::string &msg){
-    LOG_STREAM << "[INFO] " <<  LOG_FILENAME <<  ":" << LOG_LINE << " "  << msg << "\n";
+    LOG_STREAM << "[INFO] " <<  LOG_FILENAME <<  ":" << LOG_LINE << "> "  << msg << "\n";
+}
+
+void write_raw_line(const std::string &msg){
+    LOG_STREAM << msg << "\n";
+}
+
+void write_raw(const std::string &msg){
+    LOG_STREAM << msg;
 }
 
 }

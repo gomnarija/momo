@@ -6,6 +6,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include <plog/Log.h>
+
 namespace momo{
 
 /*
@@ -73,7 +75,7 @@ moValPtr read_list(Tokenizer &toki, std::ifstream *file){
 /*
     converts given string into moVal representations
 */
-moValPtr readString(std::string &str){
+moValPtr read_string(std::string &str){
     Tokenizer toki(str);
     while(!toki.isEnd()){
         if(TokenizerState::WHITESPACE){
@@ -98,22 +100,35 @@ moValPtr readString(std::string &str){
 }
 
 
-//TODO: lines
-moListPtr readFile(const std::string &path){
-	moListPtr result(new moList);
+moListPtr read_file(const std::string &path){
     std::ifstream file(std::filesystem::u8path(path));
     if(!file.is_open()){
 		write_error("fajl " + path + " nije pronađen.");
-	    return result;
+	    return moListPtr(new moList);
 	}
 
 	LOG_FILENAME = get_file_name(path);
 
+	return read_file(file);
+}
+
+
+
+/*
+	reads file line by line,
+		expects file to be open,
+			closes file after it's done
+*/
+moListPtr read_file(std::ifstream &file){
+	moListPtr result(new moList);
+	if(!file.is_open()){
+		return result;
+	}
+	
 	//read line by line
     std::string line;
 	Tokenizer toki(line);
 	while(std::getline(file, line)){
-		LOG_LINE++;
 		toki.setInputString(line);
     	while(!toki.isEnd()){
     	    if(TokenizerState::WHITESPACE){
@@ -129,17 +144,18 @@ moListPtr readFile(const std::string &path){
 				    result->insert(read_atom(toki));	
 					break;
 			default:
-		            write_error("nevalidan token.");
-				    return result;
+		            break;
     	    }
 			toki.next();
     	}
+		LOG_LINE++;
     }
 
     //done
     file.close();
 	return result;
 }
+
 
 }
 

@@ -2,12 +2,13 @@
 #define READER_H
 
 #include <momo.h>
-
+#include <fstream>
 
 namespace momo{
 
-moValPtr    readString(std::string &);
-moListPtr    readFile(const std::string &);
+moValPtr     read_string(std::string &);
+moListPtr    read_file(const std::string &);
+moListPtr    read_file(std::ifstream &);
 
 }
 

@@ -55,15 +55,31 @@ std::string string_remove_quotes(const std::string &str){
     extracts filename from path
 */
 std::string get_file_name(const std::string &path){
-    if(path.find_last_of('\\') != std::string::npos){
-        return path.substr(path.find_last_of('\\'));
-    }else if(path.find_last_of('/') != std::string::npos){
-        return path.substr(path.find_last_of('/'));
+    if((path.find_last_of('\\')+1) < path.size()){
+        return path.substr(path.find_last_of('\\')+1);
+    }else if((path.find_last_of('/')+1) < path.size()){
+        return path.substr(path.find_last_of('/')+1);
     }else{
         return std::string(path);
     }
 }
 
+
+
+size_t ustrlen(const std::string &s){
+    return ustrlen(s.c_str());
+}
+
+size_t ustrlen(const char *s){
+    size_t count = 0;
+    const char *p = s;
+    while (*p != 0){
+        if ((*p & 0xc0) != 0x80)
+            ++count;
+        ++p;
+    }
+    return count;
+}
 
 
 
