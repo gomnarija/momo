@@ -11,18 +11,19 @@ std::map<std::string,
 	moValPtr (*)(moListPtr, moEnv&)> operators = {
 		{"+",&mo_sum},
 		{"-",&mo_difference},	
-		// {"*",&la_product},	
-		// {"/",&la_quotient},
-		// {"?",&la_truth_value},
-		// {"!",&la_not_truth_value},
-		// {"=",&la_equals},
-		// {">",&la_more},
-		// {"<",&la_less},
-		// {">=",&la_more_or_equal},
-		// {"<=",&la_less_or_equal},
+		{"*",&mo_product},	
+		{"/",&mo_quotient},
+		{"?",&mo_truth_value},
+		{"!",&mo_not_truth_value},
+		{"=",&mo_equals},
+		{">",&mo_greater},
+		{"<",&mo_less},
+		{">=",&mo_greater_or_equals},
+		{"<=",&mo_less_or_equals},
 		// {"==",&la_real_equals},
-		// {"&",&la_and},
-		// {"|",&la_or}
+		{"&",&mo_and},
+		{"|",&mo_or},
+		{"ispiši", &mo_print}
 	};
 
 
@@ -32,7 +33,7 @@ std::map<std::string,
 std::map<std::string,
 	moValPtr (*)(moListPtr, moEnv&)> ne_operators=
 	{	
-		// {"if",&la_if},
+		{"ako",&mo_if}
 		// {"set",&la_set},
 		// {"fset",&la_fset},
 		// {"val",&la_val},
