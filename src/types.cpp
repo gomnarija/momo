@@ -1,11 +1,39 @@
 #include "momo.h"
 
-#include <plog/Log.h>
 #include <stdexcept>
 
 namespace momo{
 
 
+// BOOL
+
+moBool::moBool(bool value) : value(value) {}
+
+bool
+moBool::getValue() {
+    return this->value;
+}
+
+std::string
+moBool::print() {
+    return this->value ? "tačno" : "netačno";
+}
+
+MO_TYPE
+moBool::getType() {
+    return MO_TYPE::MO_BOOL;
+}
+
+bool
+moBool::isTrue() {
+    return this->value;
+}
+
+bool
+moBool::equals(moValPtr other) {
+    return other->getType() == MO_TYPE::MO_BOOL &&
+            this->value == std::dynamic_pointer_cast<moBool>(other)->getValue();
+}
 
 
 // NUMBER
@@ -202,9 +230,20 @@ moFunction::print(){
     return this->name;
 }
 
- MO_TYPE 
+ MO_TYPE
 moFunction::getType(){
     return MO_TYPE::MO_FUNCTION;
+}
+
+bool
+moFunction::isTrue(){
+    return true;
+}
+
+bool
+moFunction::equals(moValPtr other){
+    // Functions are equal only if they are the same object
+    return false;
 }
 
 std::string
