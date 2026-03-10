@@ -144,12 +144,12 @@ TEST(Funkcija, HigherOrder){
 
 // --- function with ako ---
 
-// :aps [funkcija [n] [ako [< n 0] [* n [- 0 1]] n]]
-// [aps [- 0 5]] → 5  [aps 3] → 3
+// :aps [funkcija [n] [ako [< n 0] [* n -1] n]]
+// [aps -5] → 5  [aps 3] → 3
 TEST(Funkcija, WithAko){
     moEnv env;
-    run(":aps [funkcija [n] [ako [< n 0] [* n [- 0 1]] n]]", env);
-    moValPtr r1 = run("[aps [- 0 5]]", env);
+    run(":aps [funkcija [n] [ako [< n 0] [* n -1] n]]", env);
+    moValPtr r1 = run("[aps -5]", env);
     ASSERT_EQ(r1->getType(), MO_TYPE::MO_NUMBER);
     EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r1)->getValue(), 5.0);
     moValPtr r2 = run("[aps 3]", env);

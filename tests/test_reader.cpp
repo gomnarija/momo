@@ -99,6 +99,44 @@ TEST(Reader, ReadMixedList) {
 	EXPECT_EQ(list->at(2)->getType(), MO_TYPE::MO_STRING);
 }
 
+// Reading a negative number
+TEST(Reader, ReadNegativeNumber) {
+	std::string input = "-42";
+	moValPtr val = readString(input);
+	ASSERT_NE(val, nullptr);
+	EXPECT_EQ(val->getType(), MO_TYPE::MO_NUMBER);
+	EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(val)->getValue(), -42.0);
+}
+
+// Negative decimal
+TEST(Reader, ReadNegativeDecimal) {
+	std::string input = "-3.14";
+	moValPtr val = readString(input);
+	ASSERT_NE(val, nullptr);
+	EXPECT_EQ(val->getType(), MO_TYPE::MO_NUMBER);
+	EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(val)->getValue(), -3.14);
+}
+
+// Negative number in a list: [+ 1 -2] → 3 items
+TEST(Reader, NegativeNumberInList) {
+	std::string input = "[+ 1 -2]";
+	moValPtr val = readString(input);
+	auto list = std::static_pointer_cast<moList>(val);
+	EXPECT_EQ(list->size(), 3u);
+	EXPECT_EQ(list->at(2)->getType(), MO_TYPE::MO_NUMBER);
+	EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(list->at(2))->getValue(), -2.0);
+}
+
+// [- 5 3] is still subtraction (3 items, first is symbol -)
+TEST(Reader, SubtractionStillWorks) {
+	std::string input = "[- 5 3]";
+	moValPtr val = readString(input);
+	auto list = std::static_pointer_cast<moList>(val);
+	EXPECT_EQ(list->size(), 3u);
+	EXPECT_EQ(list->at(0)->getType(), MO_TYPE::MO_SYMBOL);
+	EXPECT_EQ(list->at(0)->print(), "-");
+}
+
 // TODO: Phase 2 — colon desugaring
 // TEST(Reader, ColonDesugar) {
 //     // `:boja "crvena"` should produce [označi boja "crvena"]

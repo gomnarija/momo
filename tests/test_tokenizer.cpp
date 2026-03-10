@@ -127,10 +127,70 @@ TEST(Tokenizer, Semicolon) {
 	EXPECT_EQ(t.getState(), TokenizerState::SEMICOLON);
 }
 
-// Hyphen-prefixed symbol (e.g. operator -)
+// Standalone hyphen is a symbol (subtraction operator)
 TEST(Tokenizer, HyphenSymbol) {
 	std::string input = "-";
 	Tokenizer t(input);
+	EXPECT_EQ(t.getState(), TokenizerState::SYMBOL);
+	EXPECT_EQ(t.curr(), "-");
+}
+
+// Hyphen followed by space is a symbol
+TEST(Tokenizer, HyphenSpaceIsSymbol) {
+	std::string input = "- 5";
+	Tokenizer t(input);
+	EXPECT_EQ(t.getState(), TokenizerState::SYMBOL);
+	EXPECT_EQ(t.curr(), "-");
+}
+
+// -5 is a negative number
+TEST(Tokenizer, NegativeInteger) {
+	std::string input = "-5";
+	Tokenizer t(input);
+	EXPECT_EQ(t.getState(), TokenizerState::NUMBER);
+	EXPECT_EQ(t.curr(), "-5");
+}
+
+// -3.14 is a negative decimal
+TEST(Tokenizer, NegativeDecimal) {
+	std::string input = "-3.14";
+	Tokenizer t(input);
+	EXPECT_EQ(t.getState(), TokenizerState::NUMBER);
+	EXPECT_EQ(t.curr(), "-3.14");
+}
+
+// negative number inside a list: [+ 1 -2]
+TEST(Tokenizer, NegativeNumberInList) {
+	std::string input = "[+ 1 -2]";
+	Tokenizer t(input);
+	// [
+	EXPECT_EQ(t.getState(), TokenizerState::L_PARAN);
+	t.next();
+	// +
+	EXPECT_EQ(t.getState(), TokenizerState::SYMBOL);
+	t.next();
+	// whitespace
+	EXPECT_EQ(t.getState(), TokenizerState::WHITESPACE);
+	t.next();
+	// 1
+	EXPECT_EQ(t.getState(), TokenizerState::NUMBER);
+	EXPECT_EQ(t.curr(), "1");
+	t.next();
+	// whitespace
+	EXPECT_EQ(t.getState(), TokenizerState::WHITESPACE);
+	t.next();
+	// -2
+	EXPECT_EQ(t.getState(), TokenizerState::NUMBER);
+	EXPECT_EQ(t.curr(), "-2");
+}
+
+// [- 5 3] still works as subtraction
+TEST(Tokenizer, SubtractionNotNegative) {
+	std::string input = "[- 5 3]";
+	Tokenizer t(input);
+	// [
+	t.next();
+	// - is a symbol because followed by space
 	EXPECT_EQ(t.getState(), TokenizerState::SYMBOL);
 	EXPECT_EQ(t.curr(), "-");
 }

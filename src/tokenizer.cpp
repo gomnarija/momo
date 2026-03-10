@@ -120,12 +120,21 @@ void Tokenizer::get_state(){
 		case ':':
 			this->state = TokenizerState::COLON;
 				break;
+		case '-':
+			{
+				auto next = this->currIt + 1;
+				if(next < this->inputString.end() && *next >= '0' && *next <= '9')
+					this->state = TokenizerState::NUMBER;
+				else
+					this->state = TokenizerState::SYMBOL;
+			}
+				break;
 		default:
 			if(c>='0' && c<='9')
-				this->state = 
-					TokenizerState::NUMBER; 
+				this->state =
+					TokenizerState::NUMBER;
 			else
-				this->state = 
+				this->state =
 					TokenizerState::SYMBOL;
 	}
 
