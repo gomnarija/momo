@@ -117,6 +117,9 @@ void Tokenizer::get_state(){
 		case ';':
 			this->state = TokenizerState::SEMICOLON;
 				break;
+		case ':':
+			this->state = TokenizerState::COLON;
+				break;
 		default:
 			if(c>='0' && c<='9')
 				this->state = 
@@ -135,8 +138,8 @@ bool Tokenizer::is_token_end(std::string::iterator &it)
 
 	char c = *(it);
 
-	//parentheses and semicolon, always length of one
-	if(this->state == TokenizerState::L_PARAN || this->state == TokenizerState::R_PARAN || this->state == TokenizerState::SEMICOLON){
+	//parentheses, semicolon, colon — always length of one
+	if(this->state == TokenizerState::L_PARAN || this->state == TokenizerState::R_PARAN || this->state == TokenizerState::SEMICOLON || this->state == TokenizerState::COLON){
 			return true;
 	}
 
@@ -156,8 +159,8 @@ bool Tokenizer::is_token_end(std::string::iterator &it)
 			return true;
 	}
 	
-	//atomic symbol, parse until whitespace,parentheses, semicolon or stream end
-	if(this->state == TokenizerState::SYMBOL && (c==' ' || c=='[' || c==']' || c==';' || it == this->inputString.end())){
+	//atomic symbol, parse until whitespace, parentheses, semicolon, colon or stream end
+	if(this->state == TokenizerState::SYMBOL && (c==' ' || c=='[' || c==']' || c==';' || c==':' || it == this->inputString.end())){
 				return true;
 	}
 

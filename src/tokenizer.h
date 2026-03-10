@@ -13,6 +13,7 @@ enum TokenizerState{
 		L_PARAN,
 		R_PARAN,
 		SEMICOLON,
+		COLON,
 		END
 };
 
