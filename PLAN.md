@@ -7,37 +7,33 @@
 - ~~Support multi-line input (bracket depth tracking)~~
 - ~~File mode via CLI arg: `momo script.momo`~~
 
-## Phase 1.5: Boolean type ← NEXT
-- New `MO_BOOL` type with `moBool` struct
-- Two values: `tačno` (true) and `netačno` (false)
-- `tačno` is truthy, `netačno` is falsy
-- `print()` returns `"tačno"` / `"netačno"`
-- Reader recognizes `tačno` and `netačno` as boolean literals (not symbols)
+## Phase 1.5: Boolean type ✓
+- ~~New `MO_BOOL` type with `moBool` struct~~
+- ~~Two values: `tačno` (true) and `netačno` (false)~~
+- ~~Reader recognizes `tačno` and `netačno` as boolean literals (not symbols)~~
+- ~~Self-evaluating in eval~~
 
-## Phase 1.6: Arithmetic, comparison & logic operators
-- `*` — product (like `+`, works on numbers, strings convert)
-- `/` — quotient (numbers only)
-- `?` — truthiness check (returns `tačno`/`netačno`)
-- `!` — logical not (returns `tačno`/`netačno`)
-- `=` — equality via `moVal::equals` (returns `tačno`/`netačno`)
-- `==` — referential/strict equality (returns `tačno`/`netačno`)
-- `>` — greater than
-- `<` — less than
-- `>=` — greater or equal
-- `<=` — less or equal
-- `&` — logical and (short-circuit, ne_operator)
-- `|` — logical or (short-circuit, ne_operator)
+## Phase 1.6: Arithmetic, comparison & logic operators ✓
+- ~~`*` — product, `/` — quotient (division by zero protected)~~
+- ~~`?` — truthiness, `!` — logical not~~
+- ~~`=` — equality, `==` — strict/referential equality~~
+- ~~`>`, `<`, `>=`, `<=` — numeric comparisons~~
+- ~~`&` — logical and, `|` — logical or (both short-circuit, ne_operators)~~
 
-## Phase 2: Tokenizer & Reader — `:` desugaring
-- Tokenizer: recognize `:symbol` as a single token (colon-prefixed)
-- Reader: when it sees `:boja`, reads next value, emits `[označi boja <value>]`
-- Makes `:` work anywhere, not just in entity definitions
+## Phase 2: `označi` — variable binding ✓
+- ~~`[označi ime vrednost]` — ne_operator, evaluates `vrednost`, binds to `ime`~~
+- ~~Overwrites in current scope, shadows parent scopes~~
+- ~~Added `moEnv::bindVal` (create-or-overwrite)~~
 
-## Phase 3: Core operators
-- `označi` (ne_operator) — `[označi ime vrednost]`, binds/overwrites name in current env
+## Phase 2.5: Tokenizer & Reader — `:` desugaring ✓
+- ~~Tokenizer: `COLON` state, always length 1, terminates symbols~~
+- ~~Reader: `read_colon` handles `:name value` → `[označi name value]`~~
+- ~~`:muda` and `: muda` are equivalent~~
+- ~~Works at top level and inside lists~~
+
+## Phase 3: Language constructs ← NEXT
 - `ako` (ne_operator) — `[ako uvjet onda]` / `[ako uvjet onda inače]`
 - `funkcija` (ne_operator) — `[funkcija [args] body...]` returns a `moFunction`
-- Remaining commented-out operators: `*`, `/`, `=`, `>`, `<`, `?`, `!`
 
 ## Phase 4: Dot property access
 - Tokenizer reads `objekat.ime` as a single symbol
@@ -55,8 +51,13 @@
 ## Phase 7: Game REPL
 - Separate game REPL for text adventure interaction (future)
 
+## Also done
+- Test suite (199 tests): types, bool, tokenizer, reader, eval, core, env, utils, logger, operators, označi, colon
+- Fixed semicolon tokenizer fallthrough bug
+- Added `isTrue()`/`equals()` to `moFunction`
+
 ## Key decisions
-- `označi` overwrites if name already bound
+- `označi` overwrites if name already bound, shadows parent scopes
 - Function keyword: `funkcija`
 - `:key value` desugars to `[označi key value]` (reader-level transform)
 - Entity type details: TBD
