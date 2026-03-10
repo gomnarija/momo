@@ -31,11 +31,14 @@
 - ~~`:muda` and `: muda` are equivalent~~
 - ~~Works at top level and inside lists~~
 
-## Phase 3: Language constructs ← NEXT
-- `ako` (ne_operator) — `[ako uvjet onda]` / `[ako uvjet onda inače]`
-- `funkcija` (ne_operator) — `[funkcija [args] body...]` returns a `moFunction`
+## Phase 3: Language constructs ✓
+- ~~`ako` (ne_operator) — `[ako uvjet onda]` / `[ako uvjet onda inače]`~~
+- ~~`funkcija` (ne_operator) — `[funkcija [args] body...]` returns a `moFunction`~~
+- ~~Closures: `funkcija` captures defining environment bindings~~
+- ~~Anonymous function calls: `[[funkcija [x] x] 5]`~~
+- ~~Multiple body expressions: returns last value~~
 
-## Phase 4: Dot property access
+## Phase 4: Dot property access ← NEXT
 - Tokenizer reads `objekat.ime` as a single symbol
 - Eval: if symbol contains `.`, split → look up `objekat` in env → get `ime` from its internal env
 
@@ -52,9 +55,10 @@
 - Separate game REPL for text adventure interaction (future)
 
 ## Also done
-- Test suite (199 tests): types, bool, tokenizer, reader, eval, core, env, utils, logger, operators, označi, colon
+- Test suite (228 tests): types, bool, tokenizer, reader, eval, core, env, utils, logger, operators, označi, colon, ako, funkcija
 - Fixed semicolon tokenizer fallthrough bug
 - Added `isTrue()`/`equals()` to `moFunction`
+- Closure support via captured binding map in `moFunction`
 
 ## Key decisions
 - `označi` overwrites if name already bound, shadows parent scopes
