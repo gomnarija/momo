@@ -1,7 +1,6 @@
 #include "tokenizer.h"
 #include <momo.h>
 
-#include <plog/Log.h>
 #include <iostream>
 
 
@@ -117,6 +116,7 @@ void Tokenizer::get_state(){
 				break;
 		case ';':
 			this->state = TokenizerState::SEMICOLON;
+				break;
 		default:
 			if(c>='0' && c<='9')
 				this->state = 
