@@ -5,7 +5,7 @@
 #include    <vector>
 #include	<map>
 #include    <string>
-#include 	<sstream>
+#include	"log.h"
 
 namespace momo{
 
@@ -13,6 +13,7 @@ namespace momo{
 
 enum MO_TYPE{
 	MO_NIL,
+	MO_BOOL,
 	MO_NUMBER,
 	MO_STRING,
 	MO_SYMBOL,
@@ -29,6 +30,21 @@ struct moVal{
 };
 
 typedef	std::shared_ptr<moVal> moValPtr;
+
+
+struct moBool : moVal{
+	moBool(bool value);
+
+	bool		getValue();
+	std::string	print() override;
+	MO_TYPE		getType() override;
+	bool		isTrue() override;
+	bool		equals(moValPtr other) override;
+
+private:
+	bool	value;
+};
+typedef	std::shared_ptr<moBool> moBoolPtr;
 
 
 struct moNumber : moVal{
@@ -111,7 +127,9 @@ struct moFunction : moVal{
 	moFunction(std::string name, moListPtr args, moListPtr body);
 
 	std::string print() override;
-	 MO_TYPE getType() override;
+	MO_TYPE getType() override;
+	bool isTrue() override;
+	bool equals(moValPtr other) override;
 
 	std::string	getName();
 	moListPtr	getArgs();
@@ -162,13 +180,6 @@ private:
 
 
 
-//error handling
-extern std::string				LOG_FILENAME;
-extern uint32_t					LOG_LINE;
-extern std::stringstream		LOG_STREAM;
-void							write_error(const std::string &);
-void							write_warning(const std::string &);
-void							write_debug(const std::string &);
 
 
 
