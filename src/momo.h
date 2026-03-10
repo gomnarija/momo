@@ -134,11 +134,14 @@ struct moFunction : moVal{
 	std::string	getName();
 	moListPtr	getArgs();
 	moListPtr	getBody();
+	void		setClosure(std::map<std::string, moValPtr> c);
+	const std::map<std::string, moValPtr>& getClosure() const;
 
 private:
 	std::string	    name;
 	moListPtr	    args;
 	moListPtr	    body;
+	std::map<std::string, moValPtr> closure;
 };
 typedef	std::shared_ptr<moFunction>
 		moFunctionPtr;
@@ -173,6 +176,7 @@ struct moEnv{
 	void		fsetTal(std::string, moValPtr);
 		
 	moEnv*		getUpperEnv();
+	std::map<std::string, moValPtr> getAllBindings() const;
 
 private:
 	std::map<std::string, moValPtr>	symbolValueMap;
@@ -208,6 +212,8 @@ moValPtr	mo_less_or_equals(moListPtr, moEnv&);
 moValPtr	mo_and(moListPtr, moEnv&);
 moValPtr	mo_or(moListPtr, moEnv&);
 moValPtr	mo_oznaci(moListPtr, moEnv&);
+moValPtr	mo_ako(moListPtr, moEnv&);
+moValPtr	mo_funkcija(moListPtr, moEnv&);
 
 
 

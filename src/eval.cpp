@@ -32,7 +32,9 @@ std::map<std::string,
 	{
 		{"&",&mo_and},
 		{"|",&mo_or},
-		{"označi",&mo_oznaci}
+		{"označi",&mo_oznaci},
+		{"ako",&mo_ako},
+		{"funkcija",&mo_funkcija}
 	};
 
 
@@ -77,10 +79,14 @@ moValPtr eval_atom(moValPtr atom,moEnv &env){
 
 moValPtr eval_function(moFunctionPtr function,moListPtr args,moEnv &env){
 	moEnv localEnv(&env);
-    //add function arguments to local envirionment
+    // inject closure bindings (captured at definition time)
+	for(auto& [k,v] : function->getClosure()){
+		localEnv.insertVal(k, v);
+	}
+    //add function arguments to local environment (shadow closure)
 	moListPtr funArgument = function->getArgs();
 	for(int i=0;i<funArgument->size();i++){
-		localEnv.insertVal((funArgument->at(i))->print(),args->at(i));
+		localEnv.bindVal((funArgument->at(i))->print(),args->at(i));
 	}
 
     //evaluate body, return last value
@@ -113,6 +119,12 @@ moValPtr eval_list(moValPtr list, moEnv &env){
     //check operator type
 	moValPtr   op;
 	op = listPtr->at(0);
+
+	// if operator position is a list, evaluate it (e.g. [[funkcija [x] x] 5])
+	if(op->getType() == MO_TYPE::MO_LIST){
+		op = eval_list(op, env);
+	}
+
 	if(op->getType() != MO_TYPE::MO_SYMBOL && op->getType() != MO_TYPE::MO_FUNCTION){
         write_error("nevalidan prefiks.");
 		return NIL;
@@ -142,7 +154,12 @@ moValPtr eval_list(moValPtr list, moEnv &env){
 		return operators.at(op->print())(args,env);
     }
 
-    //functions
+    //functions — op is already a function (e.g. from [[funkcija ...] args])
+	if(op->getType() == MO_TYPE::MO_FUNCTION){
+		return eval_function(std::static_pointer_cast<moFunction>(op),args,env);
+	}
+
+	//functions — look up symbol in env
 	{
 		moValPtr potFun = env_search(op,env);
 		if(potFun->getType() == MO_TYPE::MO_FUNCTION)

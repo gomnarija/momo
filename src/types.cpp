@@ -261,6 +261,16 @@ moFunction::getBody(){
     return this->body;
 }
 
+void
+moFunction::setClosure(std::map<std::string, moValPtr> c){
+    this->closure = c;
+}
+
+const std::map<std::string, moValPtr>&
+moFunction::getClosure() const{
+    return this->closure;
+}
+
 
 
 // Nil
@@ -332,6 +342,24 @@ moEnv::bindVal(std::string key, moValPtr val){
 moEnv*
 moEnv::getUpperEnv(){
     return this->upperEnv;
+}
+
+std::map<std::string, moValPtr>
+moEnv::getAllBindings() const{
+    std::map<std::string, moValPtr> result;
+    // walk from outermost to innermost so inner shadows outer
+    const moEnv* curr = this;
+    std::vector<const moEnv*> chain;
+    while(curr != nullptr){
+        chain.push_back(curr);
+        curr = curr->upperEnv;
+    }
+    // reverse: outermost first
+    for(int i = chain.size()-1; i >= 0; i--){
+        for(auto& [k,v] : chain[i]->symbolValueMap)
+            result[k] = v;
+    }
+    return result;
 }
 
 

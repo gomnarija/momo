@@ -20,6 +20,8 @@ add_executable(momo_tests
   test_operators.cpp
   test_oznaci.cpp
   test_colon.cpp
+  test_ako.cpp
+  test_funkcija.cpp
 )
 
 target_link_libraries(momo_tests PRIVATE momo_lib GTest::gtest_main)

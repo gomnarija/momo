@@ -321,4 +321,44 @@ moValPtr mo_oznaci(moListPtr items, moEnv& env){
 }
 
 
+// ne_operator: [ako uvjet onda] or [ako uvjet onda inače]
+// items->at(0) is "ako", at(1) is condition, at(2) is then-branch, at(3) is optional else-branch
+moValPtr mo_ako(moListPtr items, moEnv& env){
+    if(items->size() < 3){
+        write_error("ako, potrebni su uvjet i vrednost.");
+        return NIL;
+    }
+    moValPtr condition = eval(items->at(1), env);
+    if(condition->isTrue()){
+        return eval(items->at(2), env);
+    }else{
+        if(items->size() >= 4)
+            return eval(items->at(3), env);
+        return NIL;
+    }
+}
+
+
+// ne_operator: [funkcija [args] body...]
+// items->at(0) is "funkcija", at(1) is arg list, at(2..) is body
+moValPtr mo_funkcija(moListPtr items, moEnv& env){
+    if(items->size() < 3){
+        write_error("funkcija, potrebni su argumenti i telo.");
+        return NIL;
+    }
+    if(items->at(1)->getType() != MO_TYPE::MO_LIST){
+        write_error("funkcija, argumenti moraju biti lista.");
+        return NIL;
+    }
+    moListPtr args = std::static_pointer_cast<moList>(items->at(1));
+    moListPtr body(new moList);
+    for(size_t i = 2; i < items->size(); i++){
+        body->insert(items->at(i));
+    }
+    auto fn = std::make_shared<moFunction>("", args, body);
+    fn->setClosure(env.getAllBindings());
+    return fn;
+}
+
+
 }
