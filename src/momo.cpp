@@ -2,44 +2,90 @@
 #include "tokenizer.h"
 #include "reader.h"
 
-
 #include <iostream>
+#include <string>
 
+static void run_file(const std::string& path) {
+	momo::moEnv env;
+	auto& logger = momo::Logger::instance();
 
-namespace momo{
-
-
-
-
-
-
+	momo::moListPtr res = momo::readFile(path);
+	for (size_t i = 0; i < res->size(); i++) {
+		momo::moValPtr eres = momo::eval(res->at(i), env);
+		if (eres->getType() != momo::MO_TYPE::MO_NIL) {
+			std::cout << eres->print() << "\n";
+		}
+		if (logger.hasErrors()) {
+			logger.flush();
+		}
+	}
 }
 
+static void run_repl() {
+	momo::moEnv env;
+	auto& logger = momo::Logger::instance();
+	logger.setFilename("[repl]");
 
-int main(){
-    // std::string input = "[prostorija zgrada  : opis \"sasvim obicna zgrada\"  : pristupacna JESTE; : udaljenost 123.45;]";
-    // momo::Tokenizer toki(input);
-    // while(!toki.isEnd()){
-    //     std::cout << toki.next() << "," << "\n";
-    // }
+	std::cout << "momo repl" << std::endl;
 
-    momo::moEnv env;
-    // std::string str = "[ - 26 5 ]";
-    // momo::moValPtr res = momo::readString(str);
-    // momo::moValPtr eres = momo::eval(res, env);
-    // std::cout << eres->print();
-    // std::cout << momo::LOG_STREAM.str();
+	std::string line;
+	std::string buffer;
+	int depth = 0;
 
-    momo::moListPtr res = momo::readFile("staznam.momo");
+	while (true) {
+		std::cout << (depth == 0 ? ">> " : ".. ");
 
-    for(int i=0;i<res->size();i++){
-        momo::moValPtr eres = momo::eval(res->at(i), env);
-        std::cout << eres->print();
-        std::cout << momo::LOG_STREAM.str();
-        
-    }
+		if (!std::getline(std::cin, line)) {
+			std::cout << std::endl;
+			break;
+		}
 
+		// Track bracket depth (naive — ignores brackets inside strings)
+		for (char c : line) {
+			if (c == '[') depth++;
+			else if (c == ']') depth--;
+		}
 
+		buffer += line + "\n";
 
-    return 0;
+		if (depth > 0) {
+			continue;
+		}
+
+		if (depth < 0) {
+			logger.error("višak zatvorenih zagrada.");
+			logger.flush();
+			buffer.clear();
+			depth = 0;
+			continue;
+		}
+
+		// Balanced — parse and eval
+		if (!buffer.empty()) {
+			logger.advanceLine();
+			momo::moValPtr ast = momo::readString(buffer);
+			if (ast != nullptr) {
+				momo::moValPtr result = momo::eval(ast, env);
+				if (result->getType() != momo::MO_TYPE::MO_NIL) {
+					std::cout << result->print() << std::endl;
+				}
+			}
+			if (logger.hasErrors()) {
+				logger.flush();
+			}
+			logger.clear();
+		}
+
+		buffer.clear();
+		depth = 0;
+	}
+}
+
+int main(int argc, char* argv[]) {
+	if (argc > 1) {
+		run_file(argv[1]);
+	} else {
+		run_repl();
+	}
+	return 0;
 }

@@ -23,6 +23,10 @@ moValPtr read_atom(Tokenizer &toki){
 		case TokenizerState::STRING:
 			return moValPtr(new moString(string_remove_quotes(toki.curr())));
 		default:
+			if(toki.curr() == "tačno")
+				return moValPtr(new moBool(true));
+			if(toki.curr() == "netačno")
+				return moValPtr(new moBool(false));
 			return moValPtr(new moSymbol(toki.curr()));
 	}
 }
@@ -48,7 +52,7 @@ moValPtr read_list(Tokenizer &toki, std::ifstream *file){
 			}else{
 				//go to new line
 				toki.setInputString(nextLine);
-				LOG_LINE++;
+				Logger::instance().advanceLine();
 				continue;
 			}
         }
@@ -107,13 +111,13 @@ moListPtr readFile(const std::string &path){
 	    return result;
 	}
 
-	LOG_FILENAME = get_file_name(path);
+	Logger::instance().setFilename(get_file_name(path));
 
 	//read line by line
     std::string line;
 	Tokenizer toki(line);
 	while(std::getline(file, line)){
-		LOG_LINE++;
+		Logger::instance().advanceLine();
 		toki.setInputString(line);
     	while(!toki.isEnd()){
     	    if(TokenizerState::WHITESPACE){
