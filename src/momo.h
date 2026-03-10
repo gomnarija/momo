@@ -169,6 +169,7 @@ struct moEnv{
 	moValPtr	getVal(std::string);
 	void		setVal(std::string, moValPtr);
 	void		insertVal(std::string, moValPtr);
+	void		bindVal(std::string, moValPtr);
 	void		fsetTal(std::string, moValPtr);
 		
 	moEnv*		getUpperEnv();
@@ -194,6 +195,19 @@ moValPtr 			eval(moValPtr, moEnv&);
 //core
 moValPtr 	mo_sum(moListPtr, moEnv&);
 moValPtr 	mo_difference(moListPtr, moEnv&);
+moValPtr	mo_product(moListPtr, moEnv&);
+moValPtr	mo_quotient(moListPtr, moEnv&);
+moValPtr	mo_truth_value(moListPtr, moEnv&);
+moValPtr	mo_not_truth_value(moListPtr, moEnv&);
+moValPtr	mo_equals(moListPtr, moEnv&);
+moValPtr	mo_strict_equals(moListPtr, moEnv&);
+moValPtr	mo_greater(moListPtr, moEnv&);
+moValPtr	mo_less(moListPtr, moEnv&);
+moValPtr	mo_greater_or_equals(moListPtr, moEnv&);
+moValPtr	mo_less_or_equals(moListPtr, moEnv&);
+moValPtr	mo_and(moListPtr, moEnv&);
+moValPtr	mo_or(moListPtr, moEnv&);
+moValPtr	mo_oznaci(moListPtr, moEnv&);
 
 
 

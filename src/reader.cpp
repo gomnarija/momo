@@ -17,7 +17,7 @@ moValPtr read_atom(Tokenizer &toki){
         return NIL;
     }
     //get moVal from token based on state
-	switch(toki.getState()){ 
+	switch(toki.getState()){
 		case TokenizerState::NUMBER:
 			return moValPtr(new moNumber(toki.curr()));
 		case TokenizerState::STRING:
@@ -31,6 +31,67 @@ moValPtr read_atom(Tokenizer &toki){
 	}
 }
 
+
+// Forward declarations
+moValPtr read_list(Tokenizer &toki, std::ifstream *file);
+moValPtr read_value(Tokenizer &toki, std::ifstream *file);
+moValPtr read_colon(Tokenizer &toki, std::ifstream *file);
+
+
+/*
+    reads the next non-whitespace value from the tokenizer
+    (atom, list, or colon expression)
+*/
+moValPtr read_value(Tokenizer &toki, std::ifstream *file){
+	// skip whitespace
+	while(toki.getState() == TokenizerState::WHITESPACE && !toki.isEnd())
+		toki.next();
+
+	if(toki.isEnd()){
+		write_error("ulaz se nenadano završio usred čitanja.");
+		return NIL;
+	}
+
+	if(toki.getState() == TokenizerState::L_PARAN)
+		return read_list(toki, file);
+	if(toki.getState() == TokenizerState::COLON)
+		return read_colon(toki, file);
+	return read_atom(toki);
+}
+
+
+/*
+    handles `:name value` => [označi name value]
+    current token is COLON
+*/
+moValPtr read_colon(Tokenizer &toki, std::ifstream *file){
+	// skip past the colon
+	toki.next();
+	// skip whitespace after colon
+	while(toki.getState() == TokenizerState::WHITESPACE && !toki.isEnd())
+		toki.next();
+
+	if(toki.isEnd() || toki.getState() != TokenizerState::SYMBOL){
+		write_error("očekivano ime posle ':'.");
+		return NIL;
+	}
+
+	// read the name
+	moValPtr name(new moSymbol(toki.curr()));
+
+	// advance past name, then read the value
+	toki.next();
+	moValPtr value = read_value(toki, file);
+
+	// build [označi name value]
+	moListPtr result(new moList);
+	result->insert(moValPtr(new moSymbol("označi")));
+	result->insert(name);
+	result->insert(value);
+	return result;
+}
+
+
 /*
     converts list of tokens based on states
 */
@@ -39,7 +100,7 @@ moValPtr read_list(Tokenizer &toki, std::ifstream *file){
 		write_error("neočekivani token na mestu '['.");
 		return NIL;
     }
-	
+
 	moListPtr result(new moList);
     //start collecting items
 	std::string token = toki.next();
@@ -61,14 +122,17 @@ moValPtr read_list(Tokenizer &toki, std::ifstream *file){
             continue;
         }
 
-		if(toki.getState() == TokenizerState::L_PARAN){//list in list
+		if(toki.getState() == TokenizerState::L_PARAN){
 			result->insert(read_list(toki, file));
+        }
+		else if(toki.getState() == TokenizerState::COLON){
+			result->insert(read_colon(toki, file));
         }
 		else{
 			result->insert(read_atom(toki));
         }
-        
-		token = toki.next();		 
+
+		token = toki.next();
 	}
 	return result;
 }
@@ -80,17 +144,20 @@ moValPtr read_list(Tokenizer &toki, std::ifstream *file){
 moValPtr readString(std::string &str){
     Tokenizer toki(str);
     while(!toki.isEnd()){
-        if(TokenizerState::WHITESPACE){
+        if(toki.getState() == TokenizerState::WHITESPACE){
+            toki.next();
             continue;
         }
 
         switch(toki.getState()){
             case TokenizerState::L_PARAN:
 			    return read_list(toki, nullptr);
+			case TokenizerState::COLON:
+				return read_colon(toki, nullptr);
 		    case TokenizerState::NUMBER:
 		    case TokenizerState::STRING:
 		    case TokenizerState::SYMBOL:
-			    return read_atom(toki);	
+			    return read_atom(toki);
 		default:
 	            write_error("nevalidan token.");
 			    return NIL;
@@ -120,17 +187,21 @@ moListPtr readFile(const std::string &path){
 		Logger::instance().advanceLine();
 		toki.setInputString(line);
     	while(!toki.isEnd()){
-    	    if(TokenizerState::WHITESPACE){
+    	    if(toki.getState() == TokenizerState::WHITESPACE){
+    	        toki.next();
     	        continue;
     	    }
     	    switch(toki.getState()){
     	        case TokenizerState::L_PARAN:
 				    result->insert(read_list(toki, &file));
 			    	break;
+				case TokenizerState::COLON:
+					result->insert(read_colon(toki, &file));
+					break;
 				case TokenizerState::NUMBER:
 			    case TokenizerState::STRING:
 			    case TokenizerState::SYMBOL:
-				    result->insert(read_atom(toki));	
+				    result->insert(read_atom(toki));
 					break;
 			default:
 		            write_error("nevalidan token.");
@@ -146,4 +217,3 @@ moListPtr readFile(const std::string &path){
 }
 
 }
-

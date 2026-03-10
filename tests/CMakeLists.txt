@@ -17,6 +17,9 @@ add_executable(momo_tests
   test_env.cpp
   test_utils.cpp
   test_logger.cpp
+  test_operators.cpp
+  test_oznaci.cpp
+  test_colon.cpp
 )
 
 target_link_libraries(momo_tests PRIVATE momo_lib GTest::gtest_main)

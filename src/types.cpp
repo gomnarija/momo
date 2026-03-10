@@ -323,6 +323,11 @@ moEnv::insertVal(std::string key, moValPtr val){
     if(this->symbolValueMap.find(key) == this->symbolValueMap.end())
         this->symbolValueMap[key] = val;
 }
+
+void
+moEnv::bindVal(std::string key, moValPtr val){
+    this->symbolValueMap[key] = val;
+}
 		
 moEnv*
 moEnv::getUpperEnv(){

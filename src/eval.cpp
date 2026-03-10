@@ -10,19 +10,17 @@ namespace momo{
 std::map<std::string,
 	moValPtr (*)(moListPtr, moEnv&)> operators = {
 		{"+",&mo_sum},
-		{"-",&mo_difference},	
-		// {"*",&la_product},	
-		// {"/",&la_quotient},
-		// {"?",&la_truth_value},
-		// {"!",&la_not_truth_value},
-		// {"=",&la_equals},
-		// {">",&la_more},
-		// {"<",&la_less},
-		// {">=",&la_more_or_equal},
-		// {"<=",&la_less_or_equal},
-		// {"==",&la_real_equals},
-		// {"&",&la_and},
-		// {"|",&la_or}
+		{"-",&mo_difference},
+		{"*",&mo_product},
+		{"/",&mo_quotient},
+		{"?",&mo_truth_value},
+		{"!",&mo_not_truth_value},
+		{"=",&mo_equals},
+		{"==",&mo_strict_equals},
+		{">",&mo_greater},
+		{"<",&mo_less},
+		{">=",&mo_greater_or_equals},
+		{"<=",&mo_less_or_equals}
 	};
 
 
@@ -31,14 +29,10 @@ std::map<std::string,
 */
 std::map<std::string,
 	moValPtr (*)(moListPtr, moEnv&)> ne_operators=
-	{	
-		// {"if",&la_if},
-		// {"set",&la_set},
-		// {"fset",&la_fset},
-		// {"val",&la_val},
-		// {"function",&la_function},
-		// {"let",&la_let},
-		// {"quit",&la_quit}
+	{
+		{"&",&mo_and},
+		{"|",&mo_or},
+		{"označi",&mo_oznaci}
 	};
 
 
