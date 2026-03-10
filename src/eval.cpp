@@ -65,6 +65,7 @@ moValPtr eval_atom(moValPtr atom,moEnv &env){
 	switch(atom->getType())
 	{
 		//self-eval
+		case MO_TYPE::MO_BOOL:
 		case MO_TYPE::MO_NUMBER:
 		case MO_TYPE::MO_STRING:
         case MO_TYPE::MO_NIL:
@@ -165,7 +166,8 @@ moValPtr eval(moValPtr ast, moEnv &env){
     }
 
     switch(ast->getType()){
-        case MO_TYPE::MO_NIL:    
+        case MO_TYPE::MO_NIL:
+        case MO_TYPE::MO_BOOL:
         case MO_TYPE::MO_NUMBER:
 		case MO_TYPE::MO_STRING:
 		case MO_TYPE::MO_SYMBOL:
