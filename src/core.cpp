@@ -339,24 +339,48 @@ moValPtr mo_ako(moListPtr items, moEnv& env){
 }
 
 
-// ne_operator: [funkcija [args] body...]
-// items->at(0) is "funkcija", at(1) is arg list, at(2..) is body
+// ne_operator: [funkcija [args] body...]          — anonymous
+//              [funkcija name [args] body...]      — named (binds in env, enables recursion)
+// items->at(0) is "funkcija"
 moValPtr mo_funkcija(moListPtr items, moEnv& env){
     if(items->size() < 3){
         write_error("funkcija, potrebni su argumenti i telo.");
         return NIL;
     }
-    if(items->at(1)->getType() != MO_TYPE::MO_LIST){
+
+    std::string name;
+    size_t argsIdx = 1;
+
+    // named form: at(1) is a symbol (the name), at(2) is the arg list
+    if(items->at(1)->getType() == MO_TYPE::MO_SYMBOL){
+        name = items->at(1)->print();
+        argsIdx = 2;
+        if(items->size() < 4){
+            write_error("funkcija, potrebni su ime, argumenti i telo.");
+            return NIL;
+        }
+    }
+
+    if(items->at(argsIdx)->getType() != MO_TYPE::MO_LIST){
         write_error("funkcija, argumenti moraju biti lista.");
         return NIL;
     }
-    moListPtr args = std::static_pointer_cast<moList>(items->at(1));
+    moListPtr args = std::static_pointer_cast<moList>(items->at(argsIdx));
     moListPtr body(new moList);
-    for(size_t i = 2; i < items->size(); i++){
+    for(size_t i = argsIdx + 1; i < items->size(); i++){
         body->insert(items->at(i));
     }
-    auto fn = std::make_shared<moFunction>("", args, body);
-    fn->setClosure(env.getAllBindings());
+    auto fn = std::make_shared<moFunction>(name, args, body);
+    auto closureBindings = env.getAllBindings();
+
+    // named: bind in environment and inject self into closure for recursion
+    if(!name.empty()){
+        env.bindVal(name, fn);
+        closureBindings[name] = fn;
+    }
+
+    fn->setClosure(closureBindings);
+
     return fn;
 }
 

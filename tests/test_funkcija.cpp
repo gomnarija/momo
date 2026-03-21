@@ -12,7 +12,7 @@ static moValPtr run(const std::string& code, moEnv& env){
 }
 
 
-// --- basic creation ---
+// --- basic creation (anonymous) ---
 
 // [funkcija [x] x] → moFunction
 TEST(Funkcija, CreatesFunction){
@@ -38,7 +38,89 @@ TEST(Funkcija, MultipleArgs){
 }
 
 
-// --- calling functions ---
+// --- named function creation ---
+
+// [funkcija saberi [a b] [+ a b]] → creates and binds "saberi" in env
+TEST(Funkcija, NamedCreatesAndBinds){
+    moEnv env;
+    moValPtr r = run("[funkcija saberi [a b] [+ a b]]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_FUNCTION);
+    // should also be in the environment
+    moValPtr bound = env.getVal("saberi");
+    ASSERT_EQ(bound->getType(), MO_TYPE::MO_FUNCTION);
+}
+
+// named function has the correct name
+TEST(Funkcija, NamedHasName){
+    moEnv env;
+    moValPtr r = run("[funkcija saberi [a b] [+ a b]]", env);
+    auto fn = std::static_pointer_cast<moFunction>(r);
+    EXPECT_EQ(fn->getName(), "saberi");
+}
+
+// anonymous function has empty name
+TEST(Funkcija, AnonymousHasEmptyName){
+    moEnv env;
+    moValPtr r = run("[funkcija [a b] [+ a b]]", env);
+    auto fn = std::static_pointer_cast<moFunction>(r);
+    EXPECT_EQ(fn->getName(), "");
+}
+
+// --- calling named functions ---
+
+// [funkcija dodaj1 [x] [+ x 1]]  [dodaj1 5] → 6
+TEST(Funkcija, NamedBasicCall){
+    moEnv env;
+    run("[funkcija dodaj1 [x] [+ x 1]]", env);
+    moValPtr r = run("[dodaj1 5]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_NUMBER);
+    EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r)->getValue(), 6.0);
+}
+
+// named function with no args
+// [funkcija nula [] 0]  [nula] → 0
+TEST(Funkcija, NamedZeroArgCall){
+    moEnv env;
+    run("[funkcija nula [] 0]", env);
+    moValPtr r = run("[nula]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_NUMBER);
+    EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r)->getValue(), 0.0);
+}
+
+// named function with multiple body expressions
+// [funkcija f [x] [:a 1] [+ x a]]  [f 10] → 11
+TEST(Funkcija, NamedMultipleBody){
+    moEnv env;
+    run("[funkcija f [x] [:a 1] [+ x a]]", env);
+    moValPtr r = run("[f 10]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_NUMBER);
+    EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r)->getValue(), 11.0);
+}
+
+// --- named function self-recursion ---
+
+// named function can recurse without external : binding
+// [funkcija fakt [n] [ako [= n 0] 1 [* n [fakt [- n 1]]]]]
+// [fakt 5] → 120
+TEST(Funkcija, NamedSelfRecursion){
+    moEnv env;
+    run("[funkcija fakt [n] [ako [= n 0] 1 [* n [fakt [- n 1]]]]]", env);
+    moValPtr r = run("[fakt 5]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_NUMBER);
+    EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r)->getValue(), 120.0);
+}
+
+// named function: self-reference is available inside closure
+// (the function can see itself even without being bound externally)
+TEST(Funkcija, NamedSelfReferenceInClosure){
+    moEnv env;
+    run("[funkcija brojac [n] [ako [= n 0] 0 [+ 1 [brojac [- n 1]]]]]", env);
+    moValPtr r = run("[brojac 3]", env);
+    ASSERT_EQ(r->getType(), MO_TYPE::MO_NUMBER);
+    EXPECT_DOUBLE_EQ(std::static_pointer_cast<moNumber>(r)->getValue(), 3.0);
+}
+
+// --- calling anonymous functions (existing tests) ---
 
 // :f [funkcija [x] [+ x 1]]  [f 5] → 6
 TEST(Funkcija, BasicCall){
