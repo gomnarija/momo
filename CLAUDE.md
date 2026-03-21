@@ -62,8 +62,12 @@ Errors/warnings are written to `LOG_STREAM` (a `stringstream`) with `LOG_FILENAM
 
 ## Key Design Notes
 
-- **`moEnv::fsetTal`** is declared in `momo.h` but not implemented — likely intended as a "force set" that bypasses the insert-only restriction of `insertVal`.
-- Many operators are commented out in `eval.cpp` (`if`, `set`, `val`, `function`, `let`, etc.) — these are the next things to implement per `TODOR`.
-- `moSymbol::isTrue()` and `moSymbol::equals()` are stubs returning `false`/`false`.
-- `moList::equals()` has a bug: it compares `this->at(i)` to itself instead of `list->at(i)`.
-- The `NIL` global is defined as a `static` in the header, causing a copy per translation unit — intended behavior is a shared singleton.
+- See `docs/known-issues.md` for current bugs and unimplemented stubs.
+- `ne_operators` now has: `&`, `|`, `označi`, `ako`, `funkcija` (anonymous and named with recursion support).
+- `operators` has: `+`, `-`, `*`, `/`, `=`, `==`, `>`, `<`, `>=`, `<=`, `?`, `!`.
+
+## Workflow Rules
+
+- **Document all changes**: When making code changes, update the relevant docs in `docs/` to reflect the new behavior. Keep `docs/language.md`, `docs/architecture.md`, and `docs/known-issues.md` in sync with the implementation.
+- **Commit often in meaningful segments**: Group related changes into logical commits (e.g. feature + tests + docs). Don't bundle unrelated work. Push after each meaningful segment.
+- **Commit messages**: Elegant and minimal. No co-author lines. No attribution.
